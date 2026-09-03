@@ -14,8 +14,21 @@ on:
                 description: 'Select the deployment environment'
                 options: [dev, staging, prod]
 
+# Goal: Access runtime metadata.
+# Task: Add a job with a step that prints the name of the user who triggered the workflow and the name of the branch.
+# Hint: Use the github context.                
 jobs:
     context_practice:
         runs-on: ubuntu-latest
         steps:
-            - run: echo "Workflow triggered by ${{ github.actor}} on ref ${{ github.ref}}"
+            - name: Print runtime metadata
+              run: echo "Workflow triggered by ${{ github.actor}} on ref ${{ github.ref}}"
+
+# Goal: Pass static data securely to subsequent steps without using outputs.
+# Task: Create a step that sets an environment variable for a C++ compiler flag. In the very next step, print that variable.
+
+            - name: Set compiler flag
+              run: echo "CXX_FLAGS=-O3" >> $GITHUB_ENV
+            - name: Print compiler flag
+              run: echo "Compiler flag is $CXX_FLAGS"
+            
