@@ -1,0 +1,43 @@
+name: The Multi-Target compiler
+
+# setup workflow to trigger manually
+on: workflow_dispatch
+
+
+jobs:
+    # create a job called build_app
+    build_app:
+        strategy:
+        # configuring a matrix that tests across 2 OS and 3 languages/runtimes
+            matrix:
+                os: [ubuntu-latest, windows-latest]
+                runtime: [node, python, cpp]
+                # rule to exclude the combination of windows-latest and cpp from the matrix
+                exclude:
+                    - os: windows-latest
+                      runtime: cpp
+        runs-on: ${{ matrix.os }}
+        steps:
+            # create a dummy file called build.txt -> sentence that injects the current OS and runtime into the file
+            - name: Create dummy build file
+              run: echo "Build for ${{ matrix.os }} with runtime ${{ matrix.runtime }}" >> build.txt
+        
+            # upload the build.txt as an artifact - name the artifact dynamically
+            - name: Upload build artifact
+              uses: actions/upload-artifact@7
+              with:
+                name: build-${{ matrix.os }}-${{ matrix.runtime}}
+                path: build.txt
+
+    # create a job called release_summary
+    release_summary:
+        needs: build_app
+        runs-on: ubuntu-latest
+        # this job should download all the artifacts
+        steps:
+            - name: Download all build artifacts
+              uses: actions/download-artifact@v4
+            - name: List all the directory contens
+              run: ls -la
+
+
