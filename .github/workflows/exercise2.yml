@@ -23,7 +23,7 @@ jobs:
             # if the user is not yourself - ADMIN_ROLE = false to GITHUB_ENV
             - name: Check if user is admin
               run: |
-                if [ "${{ github.actor}}" == "AndiTaTaEe "]; then
+                if [ "${{ github.actor}}" == "AndiTaTaEe"]; then
                     echo "ADMIN_ROLE=true" >> $GITHUB_ENV
                 else
                     echo "ADMIN_ROLE=false" >> $GITHUB_ENV
@@ -34,7 +34,7 @@ jobs:
             - name: Generate secure token if enable_debug is true
               id: debug_token
               run: |
-                if [ "${{ github.event.inputs.enable_debug}}" == "true"]; then
+                if [ "${{ github.event.inputs.enable_debug}}" == true ]; then
                     echo "debug_token=mock_secure_token_123" >> $GITHUB_OUTPUT
                 else
                     echo "debug_token=" >> $GITHUB_OUTPUT
