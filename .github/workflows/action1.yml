@@ -54,3 +54,28 @@ jobs:
         steps:
             - name: Print matrix values
               run: echo "Running on ${{ matrix.os }} with runtime ${{ matrix.runtime }}"
+
+# Goal: Control job execution order and pass file payloads (not just strings) between isolated virtual machines.
+# Task: Create job_a which creates a dummy React Native build file (touch bundle.js) and uses actions/upload-artifact@v4 to save it. Create job_b that uses needs: job_a, downloads the artifact using actions/download-artifact@v4, and lists the directory contents.
+
+    job_a:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Create dummy React Native build file
+              run: touch bundle.js
+            - name: Upload artifact
+              uses: actions/upload-artifact@v7
+              with:
+                name: react-native-build
+                path: bundle.js
+
+    job_b:
+        needs: job_a
+        runs-on: ubuntu-latest
+        steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: react-native-build
+            - name: List directory contents
+              run: ls -la
