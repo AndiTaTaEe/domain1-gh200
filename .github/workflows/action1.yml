@@ -1,0 +1,21 @@
+# Goal: Master workflow_dispatch and data types.
+# Task: Write a workflow that only runs manually. It should accept two inputs: a boolean named run_tests and a 
+# choice named environment (with options: dev, staging, prod).
+name: Workflow Dispatch example
+
+on:
+    workflow_dispatch:
+        inputs:
+            run_tests:
+                type: boolean
+                description: 'Run test suite?'
+            environment:
+                type: choice
+                description: 'Select the deployment environment'
+                options: [dev, staging, prod]
+
+jobs:
+    context_practice:
+        runs-on: ubuntu-latest
+        steps:
+            - run: echo "Workflow triggered by ${{ github.actor}} on ref ${{ github.ref}}"
