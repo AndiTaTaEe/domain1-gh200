@@ -26,7 +26,6 @@ jobs:
 
 # Goal: Pass static data securely to subsequent steps without using outputs.
 # Task: Create a step that sets an environment variable for a C++ compiler flag. In the very next step, print that variable.
-
             - name: Set compiler flag
               run: echo "CXX_FLAGS=-O3" >> $GITHUB_ENV
             - name: Print compiler flag
@@ -34,7 +33,6 @@ jobs:
 
 # Goal: Generate dynamic data in one step and selectively pass it to another using step IDs. (The exam heavily tests the difference between this and GITHUB_ENV).
 # Task: Assign an id to a step. Inside that step, write a script that outputs a Python version number. In the next step, use the steps context to read it.
-
             - name: Set Python version
               id: py_setup
               run: echo "version=3.10" >> $GITHUB_OUTPUT
@@ -49,6 +47,9 @@ jobs:
             matrix:
                 os: [ubuntu-latest, macos-latest]
                 runtime: [node, python]
+                exclude:
+                    - os: macos-latest
+                      runtime: python
         runs-on: ${{ matrix.os}}
         steps:
             - name: Print matrix values
