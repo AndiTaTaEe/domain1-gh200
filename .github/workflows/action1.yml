@@ -40,4 +40,16 @@ jobs:
               run: echo "version=3.10" >> $GITHUB_OUTPUT
             - name: Read output
               run: echo "Python version is ${{ steps.py_setup.outputs.version}}"
-            
+
+# Goal: Generate multiple job executions from a single definition.
+# Task: Create a new job called matrix_build. Configure a strategy matrix to run across two operating systems (ubuntu-latest, macos-latest) and two runtimes (node, python). Have the run step print both.
+
+    matrix_build:
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                runtime: [node, python]
+        runs-on: ${{ matrix.os}}
+        steps:
+            - name: Print matrix values
+              run: echo "Running on ${{ matrix.os }} with runtime ${{ matrix.runtime }}"
