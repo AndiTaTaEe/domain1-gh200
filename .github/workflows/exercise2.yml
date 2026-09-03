@@ -1,0 +1,48 @@
+name: The Context-Aware debugger
+
+# setup workflow to trigger manually
+# 2 inputs: a choice named target_env (with options: dev, staging, prod) and a boolean named enable_debug
+on:
+    workflow_dispatch:
+        inputs:
+            target_env:
+                type: choice
+                description: 'Select the target environment'
+                options: [dev, staging, prod]
+            enable_debug:
+                type: boolean
+                description: 'Enable debug mode?'
+
+jobs:
+    # first step should check the name of the user who triggered the workflow
+    check_user:
+        runs-on: ubuntu-latest
+        steps:
+            # write a script that check if the user is yourself
+            # if the user is yourself - ADMIN_ROLE = true to GITHUB_ENV
+            # if the user is not yourself - ADMIN_ROLE = false to GITHUB_ENV
+            - name: Check if user is admin
+              run: |
+                if [ "${{ github.actor}}" == "AndiTaTaEe "]; then
+                    echo "ADMIN_ROLE=true" >> $GITHUB_ENV
+                else
+                    echo "ADMIN_ROLE=false" >> $GITHUB_ENV
+                fi
+            
+            # second step -> assign an id
+            # evaluate the value of the enable_debug input -> if true - generate a mock secure token and write to GITHUB_OUTPUT
+            - name: Generate secure token if enable_debug is true
+              id: debug_token
+              run: |
+                if [ "${{ github.event.inputs.enable_debug}}" == "true"]; then
+                    echo "debug_token=mock_secure_token_123" >> $GITHUB_OUTPUT
+                else
+                    echo "debug_token=" >> $GITHUB_OUTPUT
+                fi
+                
+            # third step -> print a final status report
+            - name: Print final status report
+              run: |
+                echo "Target environment: ${{ github.event.inputs.target_env}}"
+                echo "Admin role: ${{ env.ADMIN_ROLE }}"
+                echo "Debug token: ${{ steps.debug_token.outputs.debug_token}}"
