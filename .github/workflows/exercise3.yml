@@ -1,0 +1,60 @@
+name: "The end-to-end release gate"
+
+# manual execution of the workflow
+on:
+    workflow_dispatch:
+        # ask the user for a string input - release_version (ex: v2.0) and a boolean named deplay_to_prod
+        inputs:
+            release_version:
+                type: string
+                required: true
+                description: 'Enter the release version (ex: v2.0)'
+            deploy_to_prod:
+                type: boolean
+                description: 'Deploy to production?'
+    
+jobs:
+    # create a matrix job 
+    test_job:
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+        runs-on: ${{ matrix.os }}
+        steps:
+            # first step (with id) -> write a script that outputs status=passed using github_output
+            - name: Run tests
+              id: test_status
+              run: echo "status=passed" >> $GITHUB_OUTPUT
+
+    # second job -> needs: test_job
+    package_job:
+        needs: test_job
+        runs-on: ubuntu-latest
+        # use the release_version input to create a dummy file named exactly after that version
+        steps:
+            - name: Create release package
+              run: echo "Release package for version ${{ github.event.inputs.release_version}}" >> ${{ github.event.inputs.release_version}}-bundle.tar
+              # upload the release package as an artifact
+            - name: Upload release package as an artifact
+              uses: actions/upload-artifact@v7
+              with:
+                name: ${{ github.event.inputs.release_version }}-bundle
+                path: ${{ github.event.inputs.release_version}}-bundle.tar
+
+    # third job -> needs: package_job
+    deploy_job:
+        needs: package_job
+        runs-on: ubuntu-latest
+        # the deployment job should only run if the deploy_to_prod input is true
+        if: ${{ github.event.inputs.deploy_to_prod == true }}
+        # if it's true - download the artifact and echo a success message referencing the branch it was deployed from
+        steps:
+            - name: Download release package artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: ${{ github.event.inputs.release_version }}-bundle
+            - name: Deploy to production
+              run: echo "Successfully deployed version ${{ github.event.inputs.release_version}} from branch ${{ github.ref }} to production!"
+
+
+            
