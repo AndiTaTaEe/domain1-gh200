@@ -1,0 +1,15 @@
+name: "Continuous Integration Pipeline"
+
+on: workflow_dispatch
+
+jobs: 
+    # the job should call the reusable security gate workflow
+    security_scan:
+        uses: ./.github/workflows/security-scan.yml
+        # with - only for inputs defined in the reusable workflow
+        with:
+            scan_level: critical
+        # secrets - only for secrets defined in the reusable workflow
+        secrets:
+            SCANNER_API_KEY: ${{ secrets.ORG_SECURITY_TOKEN }}
+        

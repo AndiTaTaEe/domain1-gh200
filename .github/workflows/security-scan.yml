@@ -1,0 +1,28 @@
+name: "The reusable security gate"
+
+# the workflow should be triggered by other workflows
+on:
+    workflow_call:
+        inputs:
+            scan_level:
+                type: string
+                required: true
+                description: 'Specify the security scan level (ex: basic, advanced)'
+            # the workflow should require a secret - SCANNER_API_KEY
+            secrets:
+                SCANNER_API_KEY:
+                    required: true
+                    description: 'API key for the security scanner'
+
+jobs:
+    scan_level:
+        runs-on: ubuntu-latest
+        steps:
+            # step -> echoes the scan_level and pretends to use the secret
+            - name: Run security scan
+              env: 
+                # use the secret in the step -> reference it as an environment variable
+                API_KEY: ${{ secrets.SCANNER_API_KEY}}
+              run: |
+                echo "Running security scan with level: ${{ inputs.scan_level }}"
+                echo "Using scanner API key: $API_KEY"
