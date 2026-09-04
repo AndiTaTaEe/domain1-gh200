@@ -32,6 +32,8 @@ jobs:
             # first step -> script that accesses TEST_TIMEOUT_LIMIT using vars context
             - name: Access TEST_TIMEOUT_LIMIT
               run: echo "Test timeout limit is ${{ vars.TEST_TIMEOUT_LIMIT }} seconds"
+            - name: Install redis-cli
+              run: sudo apt-get update && sudo apt-get install -y redis-tools
             # second step -> runs redis-cli ping
             - name: Check Redis service
               run: |
