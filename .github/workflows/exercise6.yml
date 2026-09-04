@@ -1,0 +1,34 @@
+name: "The dynamic matrix generator"
+
+on: workflow_dispatch
+
+jobs:
+    detect_changes:
+        # step with id - bash script that creates a JSON array of strings
+        # write the JSON array to GITHUB_OUTPUT under the key services
+        runs-on: ubuntu-latest
+        steps:
+            - name: Detect changes and generate services list
+              id: generate_services
+              run: |
+                echo "services=[\"auth-service\", \"payment-service\", \"email-service\"]" >> $GITHUB_OUTPUT
+        outputs:
+            services: ${{ steps.generate_services.outputs.services }}
+    
+
+    build_services:
+        needs: detect_changes
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                # the service dimension should be dynamically populated by reading the JSON output from the detect_changes job
+                service: ${{ fromJSON(needs.detect_changes.outputs.services) }}
+        
+        steps:
+            - name: Echo microservice name
+              run: | 
+                echo "Building microservice: ${{ matrix.service }}"
+
+
+
+              
