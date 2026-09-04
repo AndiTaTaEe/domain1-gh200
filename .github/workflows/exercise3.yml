@@ -46,7 +46,7 @@ jobs:
         needs: package_job
         runs-on: ubuntu-latest
         # the deployment job should only run if the deploy_to_prod input is true
-        if: ${{ github.event.inputs.deploy_to_prod == true }}
+        if: ${{ github.event.inputs.deploy_to_prod == 'true' }}
         # if it's true - download the artifact and echo a success message referencing the branch it was deployed from
         steps:
             - name: Download release package artifact
