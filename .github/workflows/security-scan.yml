@@ -8,11 +8,11 @@ on:
                 type: string
                 required: true
                 description: 'Specify the security scan level (ex: basic, advanced)'
-            # the workflow should require a secret - SCANNER_API_KEY
-            secrets:
-                SCANNER_API_KEY:
-                    required: true
-                    description: 'API key for the security scanner'
+        # the workflow should require a secret - SCANNER_API_KEY
+        secrets:
+            SCANNER_API_KEY:
+                required: true
+                description: 'API key for the security scanner'
 
 jobs:
     scan_level:
