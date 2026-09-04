@@ -1,0 +1,39 @@
+name: "The database integration and concurrency controller"
+
+# vars - considered trusted data -> can be used in workflows without secrets 
+# secrets - considered sensitive data -> should be used in workflows with caution (env vars, step outputs, etc.)
+
+on:
+    push:
+        branches:
+            - main
+
+# workflow-level concurrency block
+concurrency:
+    group: "db-integration-${{ github.ref }}"
+    cancel-in-progress: true # if a new run is triggered for the same group, cancel the previous run
+
+jobs:
+    # integration_tests job 
+    # configure a service container attached tot his job running redis image
+    integration_tests:
+        runs-on: ubuntu-latest
+        services:
+            redis:
+                image: redis
+                ports:
+                    - 6379:6379
+                options: >-
+                    --health-cmd "redis-cli ping"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+        steps:
+            # first step -> script that accesses TEST_TIMEOUT_LIMIT using vars context
+            - name: Access TEST_TIMEOUT_LIMIT
+              run: echo "Test timeout limit is ${{ vars.TEST_TIMEOUT_LIMIT }} seconds"
+            # second step -> runs redis-cli ping
+            - name: Check Redis service
+              run: |
+                redis-cli -h localhost ping
+                echo "Redis service is running and accessible"
