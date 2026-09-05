@@ -16,7 +16,7 @@ jobs:
             - name: Check event type
               id: event_type
               run: |
-                if [[ "${{ github.event_name }}" == "push"]]; then
+                if [[ "${{ github.event_name }}" == "push" ]]; then
                     echo "This is a continuous integration build."
                 elif [[ "${{ github.event_name }}" == "schedule" ]]; then
                     echo "This is a nightly audit."
