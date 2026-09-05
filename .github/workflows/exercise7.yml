@@ -7,6 +7,9 @@ jobs:
         # use actions/cache@v4 to cache the ~/.npm director
         runs-on: ubuntu-latest
         steps:
+          # before hashing files, check out the code
+            - name: Checkout code
+              uses: actions/checkout@v4
             - name: Cache node modules
               uses: actions/cache@v4
               env:
